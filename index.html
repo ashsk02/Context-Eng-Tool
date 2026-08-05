@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context Engineering — The Guide Your Vendor Skipped</title>
+  <meta name="description" content="The thing your AI vendor forgot to explain. A no-nonsense guide to context engineering for professionals.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #f8fafc;
+      --bg-blue:  #eef6ff;
+      --bg-green: #f0fdf4;
+      --ink:      #0f2430;
+      --body:     #334155;
+      --muted:    #64748b;
+      --blue:     #1d6fb8;
+      --blue-dk:  #0d5c8a;
+      --blue-lt:  #dbeafe;
+      --green:    #0c7c5c;
+      --green-dk: #065f46;
+      --green-lt: #dcfce7;
+      --card:     #ffffff;
+      --border:   rgba(15,36,48,0.1);
+      --radius:   12px;
+      --shadow:   0 2px 16px rgba(15,36,48,0.07);
+      --shadow-lg:0 8px 40px rgba(15,36,48,0.12);
+      --disp:     'DM Serif Display', serif;
+      --sans:     'Inter', sans-serif;
+      --mono:     'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--body); font-size: 1rem; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--blue); color: #fff; padding: .5rem 1rem; border-radius: 0 0 var(--radius) 0; font-size: .875rem; z-index: 1000; text-decoration: none; transition: top .2s; }
+    .skip-link:focus { top: 0; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(248,250,252,.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 clamp(1.25rem,5vw,3rem); }
+    .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 58px; }
+    .nav-brand { font-family: var(--disp); font-weight: 800; font-size: .95rem; color: var(--ink); text-decoration: none; letter-spacing: -.02em; }
+    .nav-brand span { color: var(--blue); }
+    .nav-links { display: flex; gap: .25rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .875rem; font-weight: 500; padding: .4rem .75rem; border-radius: 6px; transition: color .15s, background .15s; }
+    .nav-links a:hover, .nav-links a:focus { color: var(--blue); background: var(--blue-lt); outline: none; }
+    @media (max-width: 640px) { .nav-links { display: none; } }
+
+    /* HERO */
+    .hero { background: var(--bg); padding: clamp(3.5rem,9vw,7rem) clamp(1.25rem,5vw,3rem) clamp(2.5rem,7vw,5rem); }
+    .hero-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    .hero-eyebrow { font-family: var(--mono); font-size: .72rem; font-weight: 500; color: var(--blue); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 1rem; }
+    .hero h1 { font-family: var(--disp); font-size: clamp(2rem,4.5vw,3.25rem); font-weight: 800; color: var(--ink); line-height: 1.1; letter-spacing: -.03em; margin-bottom: 1.25rem; }
+    .hero h1 em { font-style: normal; color: var(--blue); }
+    .hero-sub { font-size: 1.0625rem; color: var(--body); margin-bottom: 2rem; max-width: 460px; }
+    .hero-cta { display: inline-flex; align-items: center; gap: .5rem; background: var(--blue); color: #fff; font-weight: 600; font-size: .9375rem; padding: .75rem 1.5rem; border-radius: var(--radius); text-decoration: none; transition: background .15s, transform .1s; }
+    .hero-cta:hover { background: var(--blue-dk); transform: translateY(-1px); }
+    .hero-cta:focus { outline: 3px solid var(--blue); outline-offset: 3px; }
+    @media (max-width: 768px) { .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; } .hero-diagram { order: -1; } }
+
+    /* CONTEXT STACK DIAGRAM */
+    .hero-diagram { display: flex; align-items: center; justify-content: center; }
+    .stack-diagram { width: 300px; height: 300px; position: relative; }
+    .stack-ring {
+      position: absolute; border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(.85);
+      display: flex; align-items: flex-start; justify-content: center;
+      opacity: 0;
+      animation: ring-in .5s ease forwards;
+    }
+    @keyframes ring-in {
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) { .stack-ring { animation: none; opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+    .r1 { width: 280px; height: 280px; background: rgba(219,234,254,.45); border: 1.5px solid #93c5fd; animation-delay: .1s; }
+    .r2 { width: 210px; height: 210px; background: rgba(220,252,231,.55); border: 1.5px solid #6ee7b7; animation-delay: .3s; }
+    .r3 { width: 148px; height: 148px; background: rgba(191,219,254,.55); border: 1.5px solid #60a5fa; animation-delay: .5s; }
+    .r4 { width: 92px;  height: 92px;  background: rgba(167,243,208,.65); border: 1.5px solid #34d399; animation-delay: .7s; }
+    .r5 { width: 54px;  height: 54px;  background: var(--blue-dk); border: 2px solid var(--blue); align-items: center; animation-delay: .9s; }
+    .ring-label { font-family: var(--mono); font-size: .6rem; font-weight: 500; letter-spacing: .03em; text-align: center; line-height: 1.3; padding-top: 8px; }
+    .r1 .ring-label { color: #1d4ed8; }
+    .r2 .ring-label { color: var(--green-dk); }
+    .r3 .ring-label { color: #1e40af; }
+    .r4 .ring-label { color: #047857; }
+    .r5-label { font-family: var(--disp); font-size: .65rem; font-weight: 700; color: #fff; text-align: center; line-height: 1.2; padding: 0; }
+    @media (max-width: 480px) { .stack-diagram { transform: scale(.8); } }
+
+    /* SECTIONS */
+    section { padding: clamp(3rem,7vw,5.5rem) clamp(1.25rem,5vw,3rem); }
+    .inner { max-width: 1100px; margin: 0 auto; }
+    .eyebrow { font-family: var(--mono); font-size: .7rem; font-weight: 500; color: var(--green); text-transform: uppercase; letter-spacing: .12em; margin-bottom: .75rem; }
+    .eyebrow.blue { color: var(--blue); }
+    h2.section-title { font-family: var(--disp); font-size: clamp(1.6rem,3vw,2.25rem); font-weight: 700; color: var(--ink); line-height: 1.15; letter-spacing: -.025em; margin-bottom: .875rem; }
+    .lead { font-size: 1.0625rem; color: var(--body); max-width: 600px; margin-bottom: 2.75rem; }
+
+    .bg-white { background: var(--card); }
+    .bg-blue  { background: var(--bg-blue); }
+    .bg-green { background: var(--bg-green); }
+
+    /* DEFINITION */
+    .def-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 3rem; align-items: start; }
+    @media (max-width: 768px) { .def-grid { grid-template-columns: 1fr; } }
+    .def-quote { font-family: var(--disp); font-size: clamp(1.125rem,2.2vw,1.5rem); font-weight: 700; color: var(--ink); line-height: 1.35; letter-spacing: -.02em; border-left: 4px solid var(--blue); padding-left: 1.25rem; margin-bottom: 1.5rem; }
+    .def-body p { color: var(--body); line-height: 1.75; } .def-body p+p { margin-top: .875rem; }
+    .aside { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
+    .aside h3 { font-family: var(--disp); font-weight: 700; font-size: .9375rem; color: var(--ink); margin-bottom: 1rem; }
+    .aside ul { list-style: none; display: flex; flex-direction: column; gap: .55rem; }
+    .aside li { display: flex; align-items: flex-start; gap: .6rem; font-size: .9rem; color: var(--body); }
+    .aside li::before { content: '→'; color: var(--blue); font-weight: 700; flex-shrink: 0; margin-top: .1em; }
+
+    /* LAYERS */
+    .layers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 1.125rem; }
+    .layer-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); position: relative; overflow: hidden; transition: transform .15s, box-shadow .15s; }
+    .layer-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .layer-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .c-blue::before   { background: var(--blue); }
+    .c-green::before  { background: var(--green); }
+    .c-teal::before   { background: #0891b2; }
+    .c-indigo::before { background: #4f46e5; }
+    .layer-num { font-family: var(--mono); font-size: .65rem; font-weight: 500; letter-spacing: .08em; margin-bottom: .625rem; }
+    .c-blue .layer-num   { color: var(--blue); }
+    .c-green .layer-num  { color: var(--green); }
+    .c-teal .layer-num   { color: #0891b2; }
+    .c-indigo .layer-num { color: #4f46e5; }
+    .layer-name { font-family: var(--disp); font-weight: 700; font-size: 1rem; color: var(--ink); margin-bottom: .4rem; }
+    .layer-desc { font-size: .875rem; color: var(--body); line-height: 1.65; }
+    .layer-eg { margin-top: .875rem; padding: .55rem .75rem; background: var(--bg); border-radius: 6px; font-family: var(--mono); font-size: .68rem; color: var(--muted); line-height: 1.55; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; box-shadow: var(--shadow); }
+    .stat-val { font-family: var(--disp); font-size: 2.25rem; font-weight: 800; color: var(--blue); letter-spacing: -.04em; line-height: 1; margin-bottom: .35rem; }
+    .stat-lbl { font-size: .8125rem; color: var(--muted); line-height: 1.4; }
+
+    /* IMPLEMENTATION STEPS */
+    .steps { display: flex; flex-direction: column; position: relative; }
+    .steps::before { content: ''; position: absolute; left: 22px; top: 46px; bottom: 46px; width: 2px; background: linear-gradient(to bottom, var(--blue), var(--green)); }
+    .step { display: grid; grid-template-columns: 46px 1fr; gap: 1.125rem; padding: 1.25rem 0; align-items: start; }
+    .step-n { width: 46px; height: 46px; border-radius: 50%; background: var(--card); border: 2px solid var(--blue); display: flex; align-items: center; justify-content: center; font-family: var(--disp); font-weight: 800; font-size: .875rem; color: var(--blue); flex-shrink: 0; z-index: 1; position: relative; }
+    .step:nth-child(even) .step-n { border-color: var(--green); color: var(--green); }
+    .step-body { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.125rem 1.375rem; box-shadow: var(--shadow); }
+    .step-body h3 { font-family: var(--disp); font-weight: 700; font-size: .9375rem; color: var(--ink); margin-bottom: .35rem; }
+    .step-body p { font-size: .875rem; color: var(--body); line-height: 1.7; }
+    .tip { margin-top: .75rem; padding: .55rem .875rem; background: var(--bg-blue); border-radius: 6px; font-size: .8rem; color: var(--blue-dk); line-height: 1.55; }
+
+    /* INDUSTRY TABS */
+    .tab-list { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.75rem; }
+    .tab-btn { font-size: .875rem; font-weight: 500; padding: .45rem .9rem; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; transition: all .15s; font-family: var(--sans); }
+    .tab-btn:hover, .tab-btn:focus { color: var(--blue); border-color: var(--blue); outline: none; }
+    .tab-btn[aria-selected="true"] { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    @media (max-width: 600px) { .tab-panel.active { grid-template-columns: 1fr; } }
+    .t-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.375rem; box-shadow: var(--shadow); }
+    .t-card h3 { font-family: var(--disp); font-weight: 700; font-size: .9375rem; color: var(--ink); margin-bottom: .6rem; }
+    .t-card p { font-size: .875rem; color: var(--body); line-height: 1.65; }
+    .ctx-block { margin-top: .875rem; padding: .65rem .875rem; background: var(--bg); border-left: 3px solid var(--green); border-radius: 0 6px 6px 0; }
+    .ctx-lbl { font-family: var(--mono); font-size: .62rem; font-weight: 500; color: var(--green); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .2rem; }
+    .ctx-block p { font-family: var(--mono); font-size: .68rem; color: var(--muted); line-height: 1.55; }
+
+    /* QUIZ */
+    .quiz-wrap { max-width: 660px; }
+    .prog-bar { height: 4px; background: var(--blue-lt); border-radius: 2px; margin-bottom: 2.5rem; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(to right, var(--blue), var(--green)); border-radius: 2px; transition: width .4s ease; width: 0%; }
+    .q-block { display: none; animation: q-in .3s ease; }
+    .q-block.active { display: block; }
+    @keyframes q-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .q-meta { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.125rem; }
+    .q-badge { font-family: var(--mono); font-size: .68rem; color: var(--blue); background: var(--blue-lt); padding: .2rem .55rem; border-radius: 4px; }
+    .q-text { font-family: var(--disp); font-size: clamp(1rem,2vw,1.1875rem); font-weight: 700; color: var(--ink); line-height: 1.35; margin-bottom: 1.25rem; }
+    .q-opts { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.25rem; }
+    .q-opt { display: flex; align-items: flex-start; gap: .75rem; background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: .875rem 1.125rem; cursor: pointer; font-size: .9375rem; color: var(--body); text-align: left; width: 100%; font-family: var(--sans); transition: border-color .15s, background .15s; }
+    .q-opt:hover:not(:disabled) { border-color: var(--blue); background: #f0f6ff; }
+    .q-opt:focus { outline: 3px solid var(--blue); outline-offset: 2px; }
+    .q-opt.correct { border-color: var(--green); background: #f0fdf4; color: var(--green-dk); font-weight: 500; }
+    .q-opt.wrong   { border-color: #dc2626; background: #fef2f2; color: #991b1b; }
+    .q-opt:disabled { cursor: default; }
+    .opt-key { font-family: var(--mono); font-size: .72rem; color: var(--muted); flex-shrink: 0; margin-top: .15em; }
+    .q-fb { display: none; padding: .9rem 1.125rem; border-radius: var(--radius); font-size: .875rem; line-height: 1.65; margin-bottom: 1.25rem; }
+    .q-fb.show { display: block; }
+    .q-fb.correct { background: #f0fdf4; color: var(--green-dk); border-left: 3px solid var(--green); }
+    .q-fb.wrong   { background: #fef2f2; color: #991b1b;        border-left: 3px solid #dc2626; }
+    .q-nav { display: flex; gap: .75rem; }
+    .btn { font-family: var(--sans); font-weight: 600; font-size: .9rem; padding: .65rem 1.375rem; border-radius: var(--radius); border: none; cursor: pointer; transition: all .15s; }
+    .btn-p { background: var(--blue); color: #fff; }
+    .btn-p:hover { background: var(--blue-dk); }
+    .btn-p:focus { outline: 3px solid var(--blue); outline-offset: 3px; }
+    .btn-g { background: transparent; color: var(--blue); border: 1.5px solid var(--blue); }
+    .btn-g:hover { background: var(--blue-lt); }
+    .btn:disabled { opacity: .5; cursor: default; }
+
+    /* SCORE */
+    .score-screen { display: none; text-align: center; padding: 2rem 0; animation: q-in .4s ease; }
+    .score-screen.show { display: block; }
+    .score-ring { width: 112px; height: 112px; border-radius: 50%; border: 4px solid var(--blue); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 1.5rem; background: var(--card); }
+    .score-n { font-family: var(--disp); font-size: 2.25rem; font-weight: 800; color: var(--blue); line-height: 1; }
+    .score-d { font-size: .75rem; color: var(--muted); }
+    .score-msg { font-family: var(--disp); font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: .6rem; }
+    .score-sub { font-size: .9375rem; color: var(--body); margin-bottom: 2rem; max-width: 420px; margin-left: auto; margin-right: auto; }
+
+    footer { background: var(--ink); color: rgba(255,255,255,.55); padding: 2.5rem clamp(1.25rem,5vw,3rem); text-align: center; }
+    .footer-in { max-width: 1100px; margin: 0 auto; }
+    footer h2 { font-family: var(--disp); font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: .4rem; }
+    footer p { font-size: .875rem; }
+    :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <nav aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">Context<span>Eng</span></a>
+      <ul class="nav-links">
+        <li><a href="#what-is">What It Is</a></li>
+        <li><a href="#layers">The Layers</a></li>
+        <li><a href="#implement">Implement</a></li>
+        <li><a href="#industries">Industries</a></li>
+        <li><a href="#quiz">Quiz</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-h">
+      <div class="hero-inner">
+        <div>
+          <p class="hero-eyebrow">What Your Vendor Skipped</p>
+          <h1 id="hero-h">Your AI is only as good as what you <em>tell</em> it</h1>
+          <p class="hero-sub">Every organization deploying AI is also, quietly, doing context engineering. Most are doing it badly, accidentally, and expensively. This is the guide they should have read first.</p>
+          <a href="#what-is" class="hero-cta">Find out what went wrong →</a>
+        </div>
+        <div class="hero-diagram" aria-hidden="true">
+          <div class="stack-diagram">
+            <div class="stack-ring r1"><span class="ring-label">Conversation<br>History</span></div>
+            <div class="stack-ring r2"><span class="ring-label">Retrieved<br>Documents</span></div>
+            <div class="stack-ring r3"><span class="ring-label">Tool<br>Results</span></div>
+            <div class="stack-ring r4"><span class="ring-label">System<br>Prompt</span></div>
+            <div class="stack-ring r5"><span class="r5-label">AI<br>Model</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHAT IS IT -->
+    <section id="what-is" class="bg-white" aria-labelledby="def-h">
+      <div class="inner">
+        <p class="eyebrow blue">The Inconvenient Foundation</p>
+        <h2 class="section-title" id="def-h">What is context engineering, and why didn't your vendor mention it?</h2>
+        <div class="def-grid">
+          <div>
+            <blockquote class="def-quote">"Context engineering is the discipline of designing what your AI sees. It is, almost certainly, why your last deployment underperformed."</blockquote>
+            <div class="def-body">
+              <p>When you interact with an AI, you see a chat window. Behind every response, the model receives a carefully assembled package: instructions about how to behave, documents pulled from a database, results from tools and APIs, and the prior conversation. The model doesn't know anything else.</p>
+              <p>The quality of that package — what's included, what's left out, how it's structured — determines whether the AI is useful. Vendors demonstrate this with curated demos. Production deployments are less curated. That gap is a context engineering problem.</p>
+              <p>This is distinct from <strong>prompt engineering</strong>, which is writing one better question. Context engineering is a systems discipline: how do you design the entire information environment that shapes AI behavior across thousands of interactions, most of which you will never personally review?</p>
+            </div>
+          </div>
+          <aside class="aside">
+            <h3>Why this is now your problem</h3>
+            <ul>
+              <li>Sets the quality ceiling of any AI deployment</li>
+              <li>Explains why the demo worked but production doesn't</li>
+              <li>Encodes your behavioral policies — or fails to</li>
+              <li>Determines what the AI does at 2am when nobody's watching</li>
+              <li>Cannot be outsourced to the vendor who sold you the model</li>
+              <li>Is almost never included in the initial project budget</li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAYERS -->
+    <section id="layers" class="bg-blue" aria-labelledby="layers-h">
+      <div class="inner">
+        <p class="eyebrow">What You're Actually Paying For</p>
+        <h2 class="section-title" id="layers-h">The four things you're probably not managing</h2>
+        <p class="lead">Every AI interaction — from your enterprise chatbot to your "AI-powered" product feature — is assembled from the same four layers. Your vendor managed them for the demo. Now it's your turn.</p>
+        <div class="layers-grid">
+          <article class="layer-card c-blue">
+            <p class="layer-num">LAYER 01 — INSTRUCTIONS</p>
+            <h3 class="layer-name">System Prompt</h3>
+            <p class="layer-desc">Standing instructions that tell the model who it is, what it can and cannot do, and how to behave. Set once, applied to every interaction.</p>
+            <div class="layer-eg">"You are a procurement assistant. Always cite contract clauses. Escalate requests over $50k. Never reveal supplier pricing."</div>
+          </article>
+          <article class="layer-card c-green">
+            <p class="layer-num">LAYER 02 — KNOWLEDGE</p>
+            <h3 class="layer-name">Retrieved Documents</h3>
+            <p class="layer-desc">Relevant content fetched from your organization's knowledge base — policies, manuals, records — injected at query time so the AI reasons over real data.</p>
+            <div class="layer-eg">→ Fetched: Q3 supplier contract, updated safety policy, last 6 months of incident reports</div>
+          </article>
+          <article class="layer-card c-teal">
+            <p class="layer-num">LAYER 03 — ACTIONS</p>
+            <h3 class="layer-name">Tool Results</h3>
+            <p class="layer-desc">Output from APIs and databases the AI can call — live inventory, calendar availability, CRM data — fed back into context so the model can act, not just advise.</p>
+            <div class="layer-eg">→ inventory_check("SKU-4421") → {"stock": 230, "reorder_point": 100}</div>
+          </article>
+          <article class="layer-card c-indigo">
+            <p class="layer-num">LAYER 04 — HISTORY</p>
+            <h3 class="layer-name">Conversation History</h3>
+            <p class="layer-desc">Prior turns of the conversation, giving the model memory within a session. Managing what gets kept, summarized, or dropped is a key engineering challenge.</p>
+            <div class="layer-eg">→ Keeping: last 8 messages. Summarized: earlier scope discussion. Dropped: boilerplate.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY IT MATTERS -->
+    <section class="bg-green" aria-labelledby="why-h">
+      <div class="inner">
+        <p class="eyebrow">Why it matters</p>
+        <h2 class="section-title" id="why-h">Context quality drives AI quality</h2>
+        <p class="lead">Most AI failures in organizations aren't model failures — they're context failures. Bad instructions, missing knowledge, or too much irrelevant information.</p>
+        <div class="stats-grid" aria-label="Key statistics">
+          <div class="stat-card"><div class="stat-val">~80%</div><div class="stat-lbl">of AI quality problems are context problems, not model problems</div></div>
+          <div class="stat-card"><div class="stat-val">4 layers</div><div class="stat-lbl">Every AI interaction assembles from the same four inputs</div></div>
+          <div class="stat-card"><div class="stat-val">1 window</div><div class="stat-lbl">All context must fit inside a finite token budget — curation is essential</div></div>
+          <div class="stat-card"><div class="stat-val">RAG</div><div class="stat-lbl">The dominant technique for giving AI access to your organization's current knowledge</div></div>
+        </div>
+        <div class="aside" style="max-width:660px">
+          <h3>The token budget constraint</h3>
+          <p style="font-size:.875rem;color:var(--body);line-height:1.75">AI models can only process a fixed amount of text at once — their "context window." Measured in tokens (roughly ¾ of a word each), modern models handle 100k–200k tokens. The engineering challenge is deciding what earns a spot in that budget. Too little context and the AI lacks information; too much and performance degrades. Getting this balance right is a design problem your team needs to own.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPLEMENTATION -->
+    <section id="implement" class="bg-white" aria-labelledby="impl-h">
+      <div class="inner">
+        <p class="eyebrow blue">Playbook</p>
+        <h2 class="section-title" id="impl-h">How to implement in your organization</h2>
+        <p class="lead">These steps apply regardless of your industry or scale. Start with one use case and expand.</p>
+        <div class="steps" role="list">
+          <div class="step" role="listitem">
+            <div class="step-n" aria-hidden="true">1</div>
+            <div class="step-body">
+              <h3>Identify a high-value, high-frequency task</h3>
+              <p>Pick a task your team does dozens of times daily that requires referencing internal knowledge — answering policy questions, drafting standard documents, classifying requests. The combination of frequency and knowledge-dependence makes it the best first candidate.</p>
+              <div class="tip">Good candidates: contract review, customer inquiry routing, compliance checking, report drafting.</div>
+            </div>
+          </div>
+          <div class="step" role="listitem">
+            <div class="step-n" aria-hidden="true">2</div>
+            <div class="step-body">
+              <h3>Map the knowledge the task requires</h3>
+              <p>List every document, database, or data source a skilled employee would consult to complete the task well. This is your candidate pool for retrieved context. Focus on sources that are frequently updated, authoritative, and currently hard to search quickly.</p>
+            </div>
+          </div>
+          <div class="step" role="listitem">
+            <div class="step-n" aria-hidden="true">3</div>
+            <div class="step-body">
+              <h3>Write the system prompt</h3>
+              <p>Define the AI's role, scope, tone, escalation rules, and hard constraints. Treat it like a precise job description: specific about what to do, explicit about what not to do, clear about when to hand off to a human.</p>
+              <div class="tip">The best system prompts are written collaboratively by the domain expert and the AI builder — neither alone produces the best result.</div>
+            </div>
+          </div>
+          <div class="step" role="listitem">
+            <div class="step-n" aria-hidden="true">4</div>
+            <div class="step-body">
+              <h3>Build a retrieval pipeline</h3>
+              <p>Connect your knowledge sources so relevant content can be fetched at query time. Start simple: index your most important documents, run semantic search, inject the top results. Measure retrieval quality early — garbage in, garbage out.</p>
+            </div>
+          </div>
+          <div class="step" role="listitem">
+            <div class="step-n" aria-hidden="true">5</div>
+            <div class="step-body">
+              <h3>Evaluate and iterate</h3>
+              <p>Build a test set of 50–100 real examples with known correct answers. Poor performance almost always traces back to a specific context problem: wrong documents retrieved, system prompt gaps, or context that's too long or too sparse.</p>
+              <div class="tip">Build evaluation before you scale. It's much harder to fix quality problems after users have formed habits around a broken system.</div>
+            </div>
+          </div>
+          <div class="step" role="listitem">
+            <div class="step-n" aria-hidden="true">6</div>
+            <div class="step-body">
+              <h3>Govern and maintain</h3>
+              <p>Context engineering is ongoing, not a one-time project. Documents go stale, policies change, new edge cases emerge. Assign ownership of the system prompt and knowledge sources. Treat it like a living system, not a shipped product.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INDUSTRIES -->
+    <section id="industries" class="bg-blue" aria-labelledby="ind-h">
+      <div class="inner">
+        <p class="eyebrow">Application</p>
+        <h2 class="section-title" id="ind-h">Context engineering across industries</h2>
+        <p class="lead">The same four-layer architecture applies everywhere. What changes is the knowledge, the constraints, and the workflow.</p>
+        <div class="tab-list" role="tablist" aria-label="Industry examples">
+          <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="p-finance" id="t-finance">Finance</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="p-health"  id="t-health">Healthcare</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="p-legal"   id="t-legal">Legal</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="p-mfg"     id="t-mfg">Manufacturing</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="p-edu"     id="t-edu">Education</button>
+        </div>
+
+        <div id="p-finance" class="tab-panel active" role="tabpanel" aria-labelledby="t-finance">
+          <div class="t-card">
+            <h3>Client advisor assistant</h3>
+            <p>A wealth management firm deploys an AI assistant for advisors preparing client meetings. The system retrieves the client's portfolio, recent transactions, risk profile, and relevant research — assembled fresh before each meeting.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Client portfolio summary · Q3 performance report · Risk tolerance profile · Pending tax events · 3 relevant research notes</p></div>
+          </div>
+          <div class="t-card">
+            <h3>Loan underwriting support</h3>
+            <p>Underwriters use AI to surface relevant precedents when assessing unusual applications. The system retrieves similar past decisions, current lending policy, and regulatory guidelines specific to the applicant's situation.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Lending policy v4.2 · 5 comparable past decisions · Applicant financial summary · Current rate schedule · Regulatory flags</p></div>
+          </div>
+        </div>
+
+        <div id="p-health" class="tab-panel" role="tabpanel" aria-labelledby="t-health">
+          <div class="t-card">
+            <h3>Clinical documentation assistant</h3>
+            <p>Clinicians use AI to draft discharge summaries. The system retrieves the patient's current visit notes, relevant history, active medications, and allergy list — with strict constraints and mandatory human review before any use.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Visit notes (today) · Relevant past diagnoses · Active medications · Known allergies · Discharge template</p></div>
+          </div>
+          <div class="t-card">
+            <h3>Benefits navigation assistant</h3>
+            <p>A health insurer deploys a benefits assistant that retrieves the specific member's plan details, coverage tiers, and claim history to answer eligibility questions accurately — connected to live plan data, not static FAQs.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Member plan document · Current deductible status · Prior authorization history · Network provider list</p></div>
+          </div>
+        </div>
+
+        <div id="p-legal" class="tab-panel" role="tabpanel" aria-labelledby="t-legal">
+          <div class="t-card">
+            <h3>Contract review assistant</h3>
+            <p>Associates use AI to flag non-standard clauses. The system retrieves the firm's standard playbook for that contract type and any client-specific deviations on file, enabling systematic comparison across hundreds of pages.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Firm playbook (contract type) · Client fallback positions · Contract under review · Prior negotiation history</p></div>
+          </div>
+          <div class="t-card">
+            <h3>Regulatory compliance monitor</h3>
+            <p>A compliance team monitors regulatory changes. The AI retrieves the latest guidance relevant to the firm's practice areas and maps it against current internal policies to surface gaps requiring attention.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Regulatory updates (last 30 days) · Firm's current policy documents · Jurisdiction mapping · Prior gap analyses</p></div>
+          </div>
+        </div>
+
+        <div id="p-mfg" class="tab-panel" role="tabpanel" aria-labelledby="t-mfg">
+          <div class="t-card">
+            <h3>Maintenance troubleshooting</h3>
+            <p>Technicians in the field use an AI assistant that retrieves the equipment's service history, the relevant manual section, and similar past fault cases when diagnosing failures — without needing an expert on site.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Equipment service history · Manual section (fault code) · 5 similar past incidents · Parts availability</p></div>
+          </div>
+          <div class="t-card">
+            <h3>Procurement assistant</h3>
+            <p>Buyers use AI to draft purchase orders and evaluate supplier bids. The system retrieves active contracts, the approved supplier list, budget availability, and procurement policy to ensure every order complies automatically.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Approved supplier list · Active contracts · Budget availability (live) · Procurement policy · Item specs</p></div>
+          </div>
+        </div>
+
+        <div id="p-edu" class="tab-panel" role="tabpanel" aria-labelledby="t-edu">
+          <div class="t-card">
+            <h3>Personalized tutoring</h3>
+            <p>An adaptive learning platform retrieves each student's prior performance, current module, and identified misconceptions to tailor explanations and difficulty — giving every student a different experience from the same model.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Student performance history · Current module content · Identified misconceptions · Preferred explanation style</p></div>
+          </div>
+          <div class="t-card">
+            <h3>Admissions review support</h3>
+            <p>Admissions teams use AI to draft evaluation summaries. The system retrieves the program's rubric, the institution's stated values, and comparable past decisions to produce consistent structured assessments.</p>
+            <div class="ctx-block"><p class="ctx-lbl">Context injected</p><p>Program rubric and criteria · Application materials · 3 comparable past decisions · Program constraints</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="bg-green" aria-labelledby="quiz-h">
+      <div class="inner">
+        <p class="eyebrow">Test your understanding</p>
+        <h2 class="section-title" id="quiz-h">Context engineering quiz</h2>
+        <p class="lead">Seven questions designed to test real understanding, not recall.</p>
+        <div class="quiz-wrap">
+          <div class="prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0" aria-label="Quiz progress">
+            <div class="prog-fill" id="pfill"></div>
+          </div>
+
+          <!-- Q1 -->
+          <div class="q-block active" id="q1" role="group" aria-labelledby="qt1">
+            <div class="q-meta"><span class="q-badge">Q 01 / 07</span></div>
+            <p class="q-text" id="qt1">Which best describes what "context engineering" is?</p>
+            <div class="q-opts">
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q1')"><span class="opt-key">A</span>Writing better individual prompts to get more useful AI responses</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q1')"><span class="opt-key">B</span>Training or fine-tuning the AI model on your organization's data</button>
+              <button class="q-opt" data-a="right" onclick="pick(this,'q1')"><span class="opt-key">C</span>Designing and managing all the information an AI model receives when processing requests</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q1')"><span class="opt-key">D</span>Evaluating the quality of AI responses after they are generated</button>
+            </div>
+            <div class="q-fb" id="fb1"><strong>Correct.</strong> Context engineering designs the full information package the model receives — instructions, knowledge, tools, and history. Distinct from prompt engineering (one better question) or model training (modifying the model itself).</div>
+            <div class="q-nav"><button class="btn btn-p" id="nxt1" onclick="advance(1)" disabled>Next →</button></div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="q-block" id="q2" role="group" aria-labelledby="qt2">
+            <div class="q-meta"><span class="q-badge">Q 02 / 07</span></div>
+            <p class="q-text" id="qt2">Your company wants an AI assistant that always follows your procurement policy, which updates quarterly. What context layer is most important to get right?</p>
+            <div class="q-opts">
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q2')"><span class="opt-key">A</span>Conversation history — so the assistant remembers past requests</button>
+              <button class="q-opt" data-a="right" onclick="pick(this,'q2')"><span class="opt-key">B</span>Retrieved documents — fetching the current policy at query time so the AI always has the latest version</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q2')"><span class="opt-key">C</span>Tool results — connecting to live databases for real-time data</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q2')"><span class="opt-key">D</span>System prompt — hardcoding the policy text in standing instructions</button>
+            </div>
+            <div class="q-fb" id="fb2"><strong>Correct.</strong> Policies that change regularly should live in a retrieval system, not the system prompt. Fetching the current policy version at query time ensures the AI always reasons from the latest source. Hardcoding it in the system prompt (D) will drift out of date every quarter.</div>
+            <div class="q-nav"><button class="btn btn-p" id="nxt2" onclick="advance(2)" disabled>Next →</button></div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="q-block" id="q3" role="group" aria-labelledby="qt3">
+            <div class="q-meta"><span class="q-badge">Q 03 / 07</span></div>
+            <p class="q-text" id="qt3">What does RAG stand for, and what problem does it solve?</p>
+            <div class="q-opts">
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q3')"><span class="opt-key">A</span>Rapid AI Generation — it speeds up model inference for high-volume applications</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q3')"><span class="opt-key">B</span>Ranked Answer Generation — it re-ranks AI outputs by confidence score</button>
+              <button class="q-opt" data-a="right" onclick="pick(this,'q3')"><span class="opt-key">C</span>Retrieval Augmented Generation — giving AI access to your organization's current knowledge without retraining the model</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q3')"><span class="opt-key">D</span>Rule-Augmented Generation — it enforces compliance rules in AI outputs</button>
+            </div>
+            <div class="q-fb" id="fb3"><strong>Correct.</strong> RAG is the dominant technique for connecting AI to organizational knowledge. Rather than retraining the model, you build a search index over your documents and inject the most relevant content into context at query time. The AI then reasons over real, current data — not just what it learned during training.</div>
+            <div class="q-nav"><button class="btn btn-p" id="nxt3" onclick="advance(3)" disabled>Next →</button></div>
+          </div>
+
+          <!-- Q4 -->
+          <div class="q-block" id="q4" role="group" aria-labelledby="qt4">
+            <div class="q-meta"><span class="q-badge">Q 04 / 07</span></div>
+            <p class="q-text" id="qt4">An AI assistant at a law firm gives inconsistent answers about client confidentiality — sometimes advising caution, sometimes not mentioning it at all. What is the most likely cause?</p>
+            <div class="q-opts">
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q4')"><span class="opt-key">A</span>The model is too old and needs to be upgraded</button>
+              <button class="q-opt" data-a="right" onclick="pick(this,'q4')"><span class="opt-key">B</span>The system prompt doesn't clearly mandate confidentiality reminders, so the behavior is inconsistent</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q4')"><span class="opt-key">C</span>The conversation history is too long and causing the model to forget instructions</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q4')"><span class="opt-key">D</span>The retrieval system is returning the wrong documents</button>
+            </div>
+            <div class="q-fb" id="fb4"><strong>Correct.</strong> Inconsistent behavior on a critical rule almost always means the rule isn't clearly stated in the system prompt. If confidentiality guidance must appear in every applicable response, it needs to be an explicit requirement — not left for the model to infer. Gaps in the system prompt produce gaps in behavior.</div>
+            <div class="q-nav"><button class="btn btn-p" id="nxt4" onclick="advance(4)" disabled>Next →</button></div>
+          </div>
+
+          <!-- Q5 -->
+          <div class="q-block" id="q5" role="group" aria-labelledby="qt5">
+            <div class="q-meta"><span class="q-badge">Q 05 / 07</span></div>
+            <p class="q-text" id="qt5">Why is the "context window" an important constraint to understand when building AI applications?</p>
+            <div class="q-opts">
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q5')"><span class="opt-key">A</span>It limits how many users can access the AI system simultaneously</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q5')"><span class="opt-key">B</span>It controls the maximum response length the model can generate</button>
+              <button class="q-opt" data-a="right" onclick="pick(this,'q5')"><span class="opt-key">C</span>It's the finite amount of text the model can process at once, forcing careful decisions about what information earns a place in context</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q5')"><span class="opt-key">D</span>It's the time window during which an AI session remains active before timing out</button>
+            </div>
+            <div class="q-fb" id="fb5"><strong>Correct.</strong> The context window is measured in tokens and is finite. All four context layers must fit within it. This creates real tradeoffs: more retrieved documents means less conversation history, longer instructions means less room for data. Understanding your token budget and spending it well is a core engineering task.</div>
+            <div class="q-nav"><button class="btn btn-p" id="nxt5" onclick="advance(5)" disabled>Next →</button></div>
+          </div>
+
+          <!-- Q6 -->
+          <div class="q-block" id="q6" role="group" aria-labelledby="qt6">
+            <div class="q-meta"><span class="q-badge">Q 06 / 07</span></div>
+            <p class="q-text" id="qt6">You're writing a system prompt for a customer service AI assistant. Which approach is more appropriate?</p>
+            <div class="q-opts">
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q6')"><span class="opt-key">A</span>"Be helpful, professional, and answer customer questions using your best judgment."</button>
+              <button class="q-opt" data-a="right" onclick="pick(this,'q6')"><span class="opt-key">B</span>"You handle billing and account inquiries only. Never discuss competitors. Escalate refund requests over $200 to a human agent. Confirm identity before sharing account details."</button>
+            </div>
+            <div class="q-fb" id="fb6"><strong>Correct.</strong> Option A is the kind of generic instruction that produces inconsistent, uncontrolled behavior. A good system prompt is specific about scope, explicit about constraints, and clear about escalation conditions. Option B names the domain, sets hard rules, and defines a handoff point — a behavioral policy document, not a vague aspiration.</div>
+            <div class="q-nav"><button class="btn btn-p" id="nxt6" onclick="advance(6)" disabled>Next →</button></div>
+          </div>
+
+          <!-- Q7 -->
+          <div class="q-block" id="q7" role="group" aria-labelledby="qt7">
+            <div class="q-meta"><span class="q-badge">Q 07 / 07</span></div>
+            <p class="q-text" id="qt7">After deploying an AI assistant that performed well in testing, a manager notices quality has degraded six months later. What is the most likely explanation?</p>
+            <div class="q-opts">
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q7')"><span class="opt-key">A</span>The AI model itself has deteriorated over time</button>
+              <button class="q-opt" data-a="right" onclick="pick(this,'q7')"><span class="opt-key">B</span>The context — documents, policies, or system prompt — has gone stale while the underlying reality has changed</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q7')"><span class="opt-key">C</span>Too many users are using the system simultaneously, causing reduced accuracy</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q7')"><span class="opt-key">D</span>The AI has learned bad habits from production conversations and needs retraining</button>
+            </div>
+            <div class="q-fb" id="fb7"><strong>Correct.</strong> Context engineering is ongoing maintenance. Policies change, products get updated, edge cases emerge. If the documents in the retrieval system aren't kept current, or the system prompt isn't revised as the business evolves, the AI gives answers that were correct at deployment but are wrong now. Assigning clear ownership of the context is as important as building it.</div>
+            <div class="q-nav"><button class="btn btn-p" id="nxt7" onclick="finish()" disabled>See my results →</button></div>
+          </div>
+
+          <!-- Score -->
+          <div class="score-screen" id="score-screen" role="region" aria-live="polite" aria-label="Quiz results">
+            <div class="score-ring">
+              <div class="score-n" id="score-n">0</div>
+              <div class="score-d">out of 7</div>
+            </div>
+            <p class="score-msg" id="score-msg">Well done</p>
+            <p class="score-sub" id="score-sub"></p>
+            <button class="btn btn-g" onclick="retake()">Retake quiz</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-in">
+      <h2>Context Engineering</h2>
+      <p>A professional guide to designing the information environment for AI in any organization.</p>
+    </div>
+  </footer>
+
+  <script>
+    const scores = {};
+    const TOTAL = 7;
+
+    function pick(btn, qId) {
+      const opts = btn.closest('.q-opts').querySelectorAll('.q-opt');
+      opts.forEach(o => o.disabled = true);
+      const right = btn.dataset.a === 'right';
+      btn.classList.add(right ? 'correct' : 'wrong');
+      if (!right) opts.forEach(o => { if (o.dataset.a === 'right') o.classList.add('correct'); });
+      scores[qId] = right ? 1 : 0;
+      const n = parseInt(qId.replace('q',''));
+      const fb = document.getElementById('fb' + n);
+      fb.classList.add('show', right ? 'correct' : 'wrong');
+      const nxt = document.getElementById('nxt' + n);
+      nxt.disabled = false;
+      nxt.focus();
+      const pbar = document.querySelector('[role="progressbar"]');
+      document.getElementById('pfill').style.width = (n / TOTAL * 100) + '%';
+      pbar.setAttribute('aria-valuenow', n);
+    }
+
+    function advance(n) {
+      document.getElementById('q' + n).classList.remove('active');
+      const next = document.getElementById('q' + (n + 1));
+      if (next) { next.classList.add('active'); next.querySelector('.q-text').focus(); }
+    }
+
+    function finish() {
+      document.getElementById('q7').classList.remove('active');
+      const total = Object.values(scores).reduce((a,b) => a+b, 0);
+      document.getElementById('score-n').textContent = total;
+      document.getElementById('pfill').style.width = '100%';
+      document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', 7);
+      const msgs = [
+        [7, 'Perfect score', 'You have a complete, nuanced understanding of context engineering. You\'re ready to lead an implementation.'],
+        [5, 'Strong foundation', 'You understand the core concepts well. Review the questions you missed to round out your thinking.'],
+        [3, 'Good start', 'The fundamentals are landing. Revisit the sections on layers and implementation to deepen your knowledge.'],
+        [0, 'Keep learning', 'Context engineering takes a bit to click — read back through the guide, then retake the quiz.']
+      ];
+      const [,msg,sub] = msgs.find(([t]) => total >= t);
+      document.getElementById('score-msg').textContent = msg;
+      document.getElementById('score-sub').textContent = sub;
+      const sc = document.getElementById('score-screen');
+      sc.classList.add('show');
+      sc.querySelector('.score-msg').focus();
+    }
+
+    function retake() {
+      for (let i = 1; i <= TOTAL; i++) {
+        delete scores['q' + i];
+        const q = document.getElementById('q' + i);
+        q.classList.remove('active');
+        q.querySelectorAll('.q-opt').forEach(o => { o.disabled = false; o.classList.remove('correct','wrong'); });
+        document.getElementById('fb' + i).classList.remove('show','correct','wrong');
+        document.getElementById('nxt' + i).disabled = true;
+      }
+      document.getElementById('score-screen').classList.remove('show');
+      document.getElementById('pfill').style.width = '0%';
+      document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', 0);
+      document.getElementById('q1').classList.add('active');
+      document.getElementById('q1').querySelector('.q-text').focus();
+    }
+
+    // Tab keyboard nav
+    document.querySelectorAll('[role="tablist"]').forEach(list => {
+      const tabs = [...list.querySelectorAll('[role="tab"]')];
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.setAttribute('aria-selected','false'));
+          tab.setAttribute('aria-selected','true');
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+          document.getElementById(tab.getAttribute('aria-controls')).classList.add('active');
+        });
+        tab.addEventListener('keydown', e => {
+          const i = tabs.indexOf(tab);
+          if (e.key === 'ArrowRight') { tabs[(i+1)%tabs.length].click(); tabs[(i+1)%tabs.length].focus(); }
+          if (e.key === 'ArrowLeft')  { tabs[(i-1+tabs.length)%tabs.length].click(); tabs[(i-1+tabs.length)%tabs.length].focus(); }
+          if (e.key === 'Home') { tabs[0].click(); tabs[0].focus(); }
+          if (e.key === 'End')  { tabs[tabs.length-1].click(); tabs[tabs.length-1].focus(); }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
