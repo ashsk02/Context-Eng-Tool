@@ -313,18 +313,18 @@
     <!-- WHY IT MATTERS -->
     <section class="bg-green" aria-labelledby="why-h">
       <div class="inner">
-        <p class="eyebrow">Why it matters</p>
-        <h2 class="section-title" id="why-h">Context quality drives AI quality</h2>
-        <p class="lead">Most AI failures in organizations aren't model failures — they're context failures. Bad instructions, missing knowledge, or too much irrelevant information.</p>
+        <p class="eyebrow">The Uncomfortable Numbers</p>
+        <h2 class="section-title" id="why-h">Your AI quality problem is a context problem</h2>
+        <p class="lead">The model is probably fine. The question is what you gave it to work with.</p>
         <div class="stats-grid" aria-label="Key statistics">
-          <div class="stat-card"><div class="stat-val">~80%</div><div class="stat-lbl">of AI quality problems are context problems, not model problems</div></div>
-          <div class="stat-card"><div class="stat-val">4 layers</div><div class="stat-lbl">Every AI interaction assembles from the same four inputs</div></div>
-          <div class="stat-card"><div class="stat-val">1 window</div><div class="stat-lbl">All context must fit inside a finite token budget — curation is essential</div></div>
-          <div class="stat-card"><div class="stat-val">RAG</div><div class="stat-lbl">The dominant technique for giving AI access to your organization's current knowledge</div></div>
+          <div class="stat-card"><div class="stat-val">~80%</div><div class="stat-lbl">of underperforming AI deployments trace to context failures, not the model — which the vendor already shipped</div></div>
+          <div class="stat-card"><div class="stat-val">4 layers</div><div class="stat-lbl">Every AI interaction assembles from the same four inputs, whether or not you designed them</div></div>
+          <div class="stat-card"><div class="stat-val">$0</div><div class="stat-lbl">Typically budgeted for context maintenance after go-live, despite it being a continuous operational requirement</div></div>
+          <div class="stat-card"><div class="stat-val">RAG</div><div class="stat-lbl">What vendors mean when they say your AI "knows your data" — it doesn't, it retrieves it. Someone has to build that.</div></div>
         </div>
         <div class="aside" style="max-width:660px">
-          <h3>The token budget constraint</h3>
-          <p style="font-size:.875rem;color:var(--body);line-height:1.75">AI models can only process a fixed amount of text at once — their "context window." Measured in tokens (roughly ¾ of a word each), modern models handle 100k–200k tokens. The engineering challenge is deciding what earns a spot in that budget. Too little context and the AI lacks information; too much and performance degrades. Getting this balance right is a design problem your team needs to own.</p>
+          <h3>The constraint your vendor's demo didn't hit</h3>
+          <p style="font-size:.875rem;color:var(--body);line-height:1.75">Modern AI models handle 100k–200k tokens — which sounds generous until you're injecting full policies, conversation history, and live tool results simultaneously. The demo used three clean paragraphs. Production uses everything. Getting the balance right is a design problem your team needs to own, on a budget your vendor never mentioned.</p>
         </div>
       </div>
     </section>
@@ -332,16 +332,16 @@
     <!-- IMPLEMENTATION -->
     <section id="implement" class="bg-white" aria-labelledby="impl-h">
       <div class="inner">
-        <p class="eyebrow blue">Playbook</p>
-        <h2 class="section-title" id="impl-h">How to implement in your organization</h2>
-        <p class="lead">These steps apply regardless of your industry or scale. Start with one use case and expand.</p>
+        <p class="eyebrow blue">The Work Nobody Budgeted For</p>
+        <h2 class="section-title" id="impl-h">How to actually implement this</h2>
+        <p class="lead">These steps apply regardless of your industry or scale. There are six of them, and your initial project budget probably only included one.</p>
         <div class="steps" role="list">
           <div class="step" role="listitem">
             <div class="step-n" aria-hidden="true">1</div>
             <div class="step-body">
               <h3>Identify a high-value, high-frequency task</h3>
               <p>Pick a task your team does dozens of times daily that requires referencing internal knowledge — answering policy questions, drafting standard documents, classifying requests. The combination of frequency and knowledge-dependence makes it the best first candidate.</p>
-              <div class="tip">Good candidates: contract review, customer inquiry routing, compliance checking, report drafting.</div>
+              <div class="tip">Good candidates: contract review, customer inquiry routing, compliance checking, report drafting. If someone suggested "let's just use the general AI," they skipped this step.</div>
             </div>
           </div>
           <div class="step" role="listitem">
@@ -356,7 +356,7 @@
             <div class="step-body">
               <h3>Write the system prompt</h3>
               <p>Define the AI's role, scope, tone, escalation rules, and hard constraints. Treat it like a precise job description: specific about what to do, explicit about what not to do, clear about when to hand off to a human.</p>
-              <div class="tip">The best system prompts are written collaboratively by the domain expert and the AI builder — neither alone produces the best result.</div>
+              <div class="tip">The best system prompts are written collaboratively by the domain expert and the AI builder — neither alone produces the best result. Most organizations assign this to whoever set up the account.</div>
             </div>
           </div>
           <div class="step" role="listitem">
@@ -371,14 +371,14 @@
             <div class="step-body">
               <h3>Evaluate and iterate</h3>
               <p>Build a test set of 50–100 real examples with known correct answers. Poor performance almost always traces back to a specific context problem: wrong documents retrieved, system prompt gaps, or context that's too long or too sparse.</p>
-              <div class="tip">Build evaluation before you scale. It's much harder to fix quality problems after users have formed habits around a broken system.</div>
+              <div class="tip">Build evaluation before you scale. It's much harder to fix quality problems after users have formed habits around a broken system. This is the step most projects skip in order to hit the launch date.</div>
             </div>
           </div>
           <div class="step" role="listitem">
             <div class="step-n" aria-hidden="true">6</div>
             <div class="step-body">
               <h3>Govern and maintain</h3>
-              <p>Context engineering is ongoing, not a one-time project. Documents go stale, policies change, new edge cases emerge. Assign ownership of the system prompt and knowledge sources. Treat it like a living system, not a shipped product.</p>
+              <p>Context engineering is ongoing, not a one-time project. Documents go stale, policies change, new edge cases emerge. Assign ownership of the system prompt and knowledge sources. Treat it like a living system, not a shipped product — which is exactly the kind of thing that should have been in the original project scope.</p>
             </div>
           </div>
         </div>
@@ -388,9 +388,9 @@
     <!-- INDUSTRIES -->
     <section id="industries" class="bg-blue" aria-labelledby="ind-h">
       <div class="inner">
-        <p class="eyebrow">Application</p>
+        <p class="eyebrow">It Applies to Your Industry Too</p>
         <h2 class="section-title" id="ind-h">Context engineering across industries</h2>
-        <p class="lead">The same four-layer architecture applies everywhere. What changes is the knowledge, the constraints, and the workflow.</p>
+        <p class="lead">The same four-layer architecture applies everywhere. What changes is the knowledge, the constraints, and, occasionally, the regulatory consequences when it goes wrong.</p>
         <div class="tab-list" role="tablist" aria-label="Industry examples">
           <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="p-finance" id="t-finance">Finance</button>
           <button class="tab-btn" role="tab" aria-selected="false" aria-controls="p-health"  id="t-health">Healthcare</button>
@@ -469,9 +469,9 @@
     <!-- QUIZ -->
     <section id="quiz" class="bg-green" aria-labelledby="quiz-h">
       <div class="inner">
-        <p class="eyebrow">Test your understanding</p>
+        <p class="eyebrow">A Brief Accountability Check</p>
         <h2 class="section-title" id="quiz-h">Context engineering quiz</h2>
-        <p class="lead">Seven questions designed to test real understanding, not recall.</p>
+        <p class="lead">Seven questions. At least three of the wrong answers have been seriously proposed in real AI planning meetings.</p>
         <div class="quiz-wrap">
           <div class="prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0" aria-label="Quiz progress">
             <div class="prog-fill" id="pfill"></div>
@@ -487,7 +487,7 @@
               <button class="q-opt" data-a="right" onclick="pick(this,'q1')"><span class="opt-key">C</span>Designing and managing all the information an AI model receives when processing requests</button>
               <button class="q-opt" data-a="wrong" onclick="pick(this,'q1')"><span class="opt-key">D</span>Evaluating the quality of AI responses after they are generated</button>
             </div>
-            <div class="q-fb" id="fb1"><strong>Correct.</strong> Context engineering designs the full information package the model receives — instructions, knowledge, tools, and history. Distinct from prompt engineering (one better question) or model training (modifying the model itself).</div>
+            <div class="q-fb" id="fb1"><strong>Correct.</strong> Context engineering designs the full information package — instructions, knowledge, tools, and history. If you chose A, that's prompt engineering: necessary, but a subset. If you chose B, that's a six-figure project that solves a different problem entirely and is frequently proposed as an alternative to this.</div>
             <div class="q-nav"><button class="btn btn-p" id="nxt1" onclick="advance(1)" disabled>Next →</button></div>
           </div>
 
@@ -501,7 +501,7 @@
               <button class="q-opt" data-a="wrong" onclick="pick(this,'q2')"><span class="opt-key">C</span>Tool results — connecting to live databases for real-time data</button>
               <button class="q-opt" data-a="wrong" onclick="pick(this,'q2')"><span class="opt-key">D</span>System prompt — hardcoding the policy text in standing instructions</button>
             </div>
-            <div class="q-fb" id="fb2"><strong>Correct.</strong> Policies that change regularly should live in a retrieval system, not the system prompt. Fetching the current policy version at query time ensures the AI always reasons from the latest source. Hardcoding it in the system prompt (D) will drift out of date every quarter.</div>
+            <div class="q-fb" id="fb2"><strong>Correct.</strong> Policies that update quarterly should live in a retrieval system, not the system prompt. Fetching at query time means the AI always reasons from the current version. Hardcoding it (D) will drift out of date every quarter — and nobody will know until an audit.</div>
             <div class="q-nav"><button class="btn btn-p" id="nxt2" onclick="advance(2)" disabled>Next →</button></div>
           </div>
 
@@ -511,11 +511,11 @@
             <p class="q-text" id="qt3">What does RAG stand for, and what problem does it solve?</p>
             <div class="q-opts">
               <button class="q-opt" data-a="wrong" onclick="pick(this,'q3')"><span class="opt-key">A</span>Rapid AI Generation — it speeds up model inference for high-volume applications</button>
-              <button class="q-opt" data-a="wrong" onclick="pick(this,'q3')"><span class="opt-key">B</span>Ranked Answer Generation — it re-ranks AI outputs by confidence score</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q3')"><span class="opt-key">B</span>Ranked Answer Generation — it re-ranks AI outputs to surface the most confident responses first</button>
               <button class="q-opt" data-a="right" onclick="pick(this,'q3')"><span class="opt-key">C</span>Retrieval Augmented Generation — giving AI access to your organization's current knowledge without retraining the model</button>
               <button class="q-opt" data-a="wrong" onclick="pick(this,'q3')"><span class="opt-key">D</span>Rule-Augmented Generation — it enforces compliance rules in AI outputs</button>
             </div>
-            <div class="q-fb" id="fb3"><strong>Correct.</strong> RAG is the dominant technique for connecting AI to organizational knowledge. Rather than retraining the model, you build a search index over your documents and inject the most relevant content into context at query time. The AI then reasons over real, current data — not just what it learned during training.</div>
+            <div class="q-fb" id="fb3"><strong>Correct.</strong> RAG is the dominant technique for connecting AI to organizational knowledge. Rather than retraining the model — a far more expensive proposition — you build a search index over your documents and inject the most relevant content into context at query time. The AI then reasons over real, current data. When your vendor says the AI "knows your data," this is usually what they mean, assuming they built it.</div>
             <div class="q-nav"><button class="btn btn-p" id="nxt3" onclick="advance(3)" disabled>Next →</button></div>
           </div>
 
@@ -529,7 +529,7 @@
               <button class="q-opt" data-a="wrong" onclick="pick(this,'q4')"><span class="opt-key">C</span>The conversation history is too long and causing the model to forget instructions</button>
               <button class="q-opt" data-a="wrong" onclick="pick(this,'q4')"><span class="opt-key">D</span>The retrieval system is returning the wrong documents</button>
             </div>
-            <div class="q-fb" id="fb4"><strong>Correct.</strong> Inconsistent behavior on a critical rule almost always means the rule isn't clearly stated in the system prompt. If confidentiality guidance must appear in every applicable response, it needs to be an explicit requirement — not left for the model to infer. Gaps in the system prompt produce gaps in behavior.</div>
+            <div class="q-fb" id="fb4"><strong>Correct.</strong> Inconsistent behavior on a critical rule almost always means the rule isn't in the system prompt. If confidentiality guidance must appear in every applicable response, it must be an explicit requirement — not an expectation the model will intuit. Gaps in the system prompt produce gaps in behavior, reliably, and at the worst possible moments.</div>
             <div class="q-nav"><button class="btn btn-p" id="nxt4" onclick="advance(4)" disabled>Next →</button></div>
           </div>
 
@@ -566,10 +566,10 @@
             <div class="q-opts">
               <button class="q-opt" data-a="wrong" onclick="pick(this,'q7')"><span class="opt-key">A</span>The AI model itself has deteriorated over time</button>
               <button class="q-opt" data-a="right" onclick="pick(this,'q7')"><span class="opt-key">B</span>The context — documents, policies, or system prompt — has gone stale while the underlying reality has changed</button>
-              <button class="q-opt" data-a="wrong" onclick="pick(this,'q7')"><span class="opt-key">C</span>Too many users are using the system simultaneously, causing reduced accuracy</button>
-              <button class="q-opt" data-a="wrong" onclick="pick(this,'q7')"><span class="opt-key">D</span>The AI has learned bad habits from production conversations and needs retraining</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q7')"><span class="opt-key">C</span>Too many users are accessing the system, diluting its accuracy across the organization</button>
+              <button class="q-opt" data-a="wrong" onclick="pick(this,'q7')"><span class="opt-key">D</span>The AI has learned bad habits from production conversations and now needs to be retrained</button>
             </div>
-            <div class="q-fb" id="fb7"><strong>Correct.</strong> Context engineering is ongoing maintenance. Policies change, products get updated, edge cases emerge. If the documents in the retrieval system aren't kept current, or the system prompt isn't revised as the business evolves, the AI gives answers that were correct at deployment but are wrong now. Assigning clear ownership of the context is as important as building it.</div>
+            <div class="q-fb" id="fb7"><strong>Correct.</strong> Context engineering is ongoing maintenance. Policies change, products update, edge cases emerge. If the retrieval system isn't kept current or the system prompt isn't revised as the business evolves, the AI gives answers that were correct at deployment but are wrong now. D is a common escalation, but models don't learn from production use — they just answer with stale context. Ownership of the context is as important as building it, and considerably less glamorous to fund.</div>
             <div class="q-nav"><button class="btn btn-p" id="nxt7" onclick="finish()" disabled>See my results →</button></div>
           </div>
 
@@ -592,7 +592,7 @@
   <footer>
     <div class="footer-in">
       <h2>Context Engineering</h2>
-      <p>A professional guide to designing the information environment for AI in any organization.</p>
+      <p>You now know more about this than most of the people who will make decisions about it. Good luck.</p>
     </div>
   </footer>
 
@@ -631,10 +631,10 @@
       document.getElementById('pfill').style.width = '100%';
       document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', 7);
       const msgs = [
-        [7, 'Perfect score', 'You have a complete, nuanced understanding of context engineering. You\'re ready to lead an implementation.'],
-        [5, 'Strong foundation', 'You understand the core concepts well. Review the questions you missed to round out your thinking.'],
-        [3, 'Good start', 'The fundamentals are landing. Revisit the sections on layers and implementation to deepen your knowledge.'],
-        [0, 'Keep learning', 'Context engineering takes a bit to click — read back through the guide, then retake the quiz.']
+        [7, 'Perfect score.', 'You already understand this better than most of the people who will make decisions about it. The next test is surviving the planning meeting.'],
+        [5, 'Solid foundation.', 'You understand the core concepts — the gaps are detail, not direction. Review the questions you missed, then apply this before someone else budgets for fine-tuning instead.'],
+        [3, 'A reasonable start.', 'The fundamentals are landing. Revisit the sections on layers and implementation to deepen your knowledge. The quiz is forgiving. Production is not.'],
+        [0, 'Keep reading.', 'Context engineering takes a moment to click. Work through the guide again, then retake. The concepts are worth the effort — the alternative is paying for them later.']
       ];
       const [,msg,sub] = msgs.find(([t]) => total >= t);
       document.getElementById('score-msg').textContent = msg;
